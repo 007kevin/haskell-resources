@@ -1,0 +1,65 @@
+* Variables & Functions
+  - Haskell variables are immutable
+  - where :: when defining a function and want to define results that are
+             local to the function
+             #+BEGIN_SRC haskell
+               heron a b c = sqrt (s * (s - a) * (s - b) * (s - c))
+                 where
+                   s = (a + b + c) / 2
+             #+END_SRC
+* Truth values
+  - infix operators can be written as functions using brackes. The following
+    expressions are equivalent
+    #+BEGIN_SRC haskell
+      4 + 9 === 13
+      (==) (4 + 9) 13
+    #+END_SRC
+  - *in general, tangible things in Haskell are either values or functions*
+** Guards
+   syntactic sugar that relies on booleans values to write simple but powerful
+   functions
+   
+   To define absolute value function:
+   #+BEGIN_SRC haskell
+     absolute x
+       | x < 0     = 0 - x
+       | otherwise = x
+   #+END_SRC
+
+   guards begin with a pipe character followed by a boolean expression followed
+   by the rest of the definition.
+
+   *Note* there is no syntactical magic begin 'otherwise'. It is defined
+   alonside the default variables and functions of Haskell as
+   #+BEGIN_SRC haskell
+     otherwise = True
+   #+END_SRC
+
+** where and guards
+   where clause works with guards.
+   Consider a function which computes the number of (real) solutions for
+   the quadratic equation
+   #+BEGIN_SRC haskell
+     numOfRealSolutions a b c
+      | disc > 0  = 2
+      | disc == 0 = 1
+      | otherwise = 0
+          where
+          disc = b^2 - 4*a*c
+   #+END_SRC
+             
+   
+* Type basics
+  - All types names in Haskell must begin with a capital letter
+  - All variables in Haskell must begin with a lower case letter
+  - :type :: to check the type of any expression
+
+** Functional types
+   Consider two things when figuring out a type of a function
+   
+   1) the type of values it takes as its input
+   2) the type of values it returns
+      
+   Thus the description of a function's type is in terms of the types of
+   argument(s) it takes and the type of value it evaluates to
+      

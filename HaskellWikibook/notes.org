@@ -48,7 +48,6 @@
           disc = b^2 - 4*a*c
    #+END_SRC
              
-   
 * Type basics
   - All types names in Haskell must begin with a capital letter
   - All variables in Haskell must begin with a lower case letter
@@ -63,3 +62,40 @@
    Thus the description of a function's type is in terms of the types of
    argument(s) it takes and the type of value it evaluates to
       
+* Lists and tuples
+** Lists
+  Haskell builds all lists by consing all elements to the empty list.
+  [1,2,3,4,5] is equivalent to 1:2:3:4:5:[]
+
+  the cons operator (:) must have a list as its second argument and
+  all elements of the list must be of same type
+** Tuples
+   Tuples offer another way of storing multiple values in a single value.
+   Key differences between tuples and lists:
+   - Tuples have a fixed number of elements (immutable); you cannot cons a tuple.
+     Makes sense to use tuples when knowing in advance how many values are to be stored.
+     (i.e 2D coordinates of a point)
+   - Elements of tuples need not be all of the same type.
+
+     nomenclature: in general use n-tuple to denote a tuple of size n. 2-tuples are called pairs,
+     3-tuples called triples, quadruples, quintuples, etc.
+
+     tuples are handy when wanting to return more than one value froma function. 
+
+     The type of a tuple is defined not only by its size but also the type of objects it contains. 
+     For example, ("Hello", 32) and (47,"World") are fundamentally different since one is
+     (String, Int) whereas other (Int, String). This difference in types means they cannot
+     be put into a list.
+
+** Retrieving values
+   Standard functions for retrieving values from tuples (works only on pairs):
+   fst :: (a,b) -> a
+   snd :: (a,b) -> b
+
+   Standard functions for retrieving values from lists):
+   head :: [a] -> a
+   tail :: [a] -> [a] -- get the list after the first value
+
+   *Note* attempting to run head or tail on the empty list will crash a program
+
+

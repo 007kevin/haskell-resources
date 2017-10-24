@@ -99,3 +99,48 @@
    *Note* attempting to run head or tail on the empty list will crash a program
 
 
+* Simple input and output
+  '<-' can be used with any action except the last
+  Q: Why can't we get a value out of the final action of a do block?
+  A: Without getting too deep, suffice to say you use <- to get the
+     value of an action, and Haskell is always expecting another action
+     to follow it
+  
+  #+BEGIN_SRC haskell
+    :t putStrLn
+      putStrLn :: String -> IO ()
+  #+END_SRC
+     *Type of putStrLn takes a String parameter and returns*
+     *an IO action that when run returns the () value.*
+
+  #+BEGIN_SRC haskell
+    :t getLine
+      getLine :: IO String
+  #+END_SRC
+     *Type of getLIne take no input paramter and returns*
+     *an action that when run returns a String*
+
+  Within a 'do block', each line runs the actions in which
+  the returned value can be assigned via <-
+
+  You can't use actions in situations that don't call for them.
+  For the converse, you can use non-actions in situations that
+  expect actions.
+     
+  For situations calling for non-actions to be used in actions,
+  one can use the 'return' code or 'let' binding.
+
+  _let bindings in do blocks_
+  #+BEGIN_SRC haskell
+main =
+ do name <- getLine
+    let loudName = makeLoud name
+    putStrLn ("Hello " ++ loudName ++ "!")
+    putStrLn ("Oh boy! Am I excited to meet you, " ++ loudName)
+  #+END_SRC
+  
+  notice the let binding above is missing an in. This is because
+  let bindings inside do blocks do not (optionally )require the 
+  in keyword.
+
+     

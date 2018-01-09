@@ -98,7 +98,6 @@
 
    *Note* attempting to run head or tail on the empty list will crash a program
 
-
 * Simple input and output
   '<-' can be used with any action except the last
   Q: Why can't we get a value out of the final action of a do block?
@@ -142,5 +141,31 @@ main =
   notice the let binding above is missing an in. This is because
   let bindings inside do blocks do not (optionally )require the 
   in keyword.
+* Recursion
+* Lists II
+  - The -> in type signatures is right associative. This means one
+    can read the this signature
+    #+BEGIN_SRC haskell
+      multiplyList :: Int -> [Int] -> [Int]
+    #+END_SRC
+    as
+    #+BEGIN_SRC haskell
+      multiplyList :: Int -> ([Int] -> [Int])
+    #+END_SRC
+    which is interprets multiplyList as a function that takes one integer
+    arguments and evalutates to another function. THe function returned, then,
+    takes a list of integers and returns another list of integers.
+ 
+  - point-free style :: the definition style of functions with no argument
+       variables
 
-     
+  *Note* All function in Haskell really take only one argument!
+
+  - higher-order functions :: Functions like map which take other functions as arguments
+
+  - Thanks to lazy evaluation, Haskell lists can be infinite since the callers only evaluates
+    only up to what is needed.
+    For example, both terminate in finite number of steps AND results to the same answer:
+    scanSum( (takeInt 10 [1..]))
+    (takeInt 10 (scanSum [1..]))
+    

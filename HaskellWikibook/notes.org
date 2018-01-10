@@ -169,3 +169,16 @@ main =
     scanSum( (takeInt 10 [1..]))
     (takeInt 10 (scanSum [1..]))
     
+* Lists III
+** List comprehensions
+   - List comprehensions :: syntactic sugar for some common list operations such as filtering
+     #+BEGIN_SRC haskell
+retainEven es = [n | n <- es, isEven n]
+     #+END_SRC
+     interpretted as:
+     - (starting from middle) :: take the list es and draw ( <- ) each of its elements as a value n
+     - (after the comma) :: for each drawn n, test the boolean condition isEven
+     - (before | ) :: if (and only if) the boolean condition is satistied, append n to the new list
+                      being created (note the square brackets around the whole expression)
+
+     thus is es is [1,2,3,4], then we would get back the list [2,3]. 1 and 3 fail the boolean hence not drawn

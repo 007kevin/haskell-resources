@@ -182,3 +182,169 @@ retainEven es = [n | n <- es, isEven n]
                       being created (note the square brackets around the whole expression)
 
      thus is es is [1,2,3,4], then we would get back the list [2,3]. 1 and 3 fail the boolean hence not drawn
+     
+      
+     
+* Other data structures
+  - catamorphisms :: a general way to collapse a data structure into a single value (i.e folds)
+* Classes and types
+  Broadly speaing, the point of type classes is to ensure that certain operations will be available for
+  values of chosen types. For example, if we know a type belongs to ( i.e instantiates ) the class
+  /Fractional/, then we are guaranteed to be able to perform real division with its values
+
+  #+BEGIN_SRC haskell
+class  Eq a  where
+   (==), (/=) :: a -> a -> Bool
+
+       -- Minimal complete definition:
+       --      (==) or (/=)
+   x /= y     =  not (x == y)
+   x == y     =  not (x /= y)
+  #+END_SRC
+
+  From looking at the definition of Eq class from Prelude, it states that if a type 'a' is to be made
+  an /instance/ of the class Eq, it must support the functions (==) and (/-) (i.e class methods), both
+  of them having type a -> a -> Bool
+
+  Additonally, the class provides default definitions for (==) and (/=) /in terms of each other/. As a 
+  consequence, there is no need for a type is Eq to provide both definitions. If one is given, then the
+  other is generate automatically.
+
+  With a class defined, we proceed to make exisiting types instances of it. 
+
+  *Example* algebraic data type made into an instance of Eq by /instance declaration/
+  #+BEGIN_SRC haskell
+data Foo = Foo {x :: Integer, str :: String}
+ 
+instance Eq Foo where
+   (Foo x1 str1) == (Foo x2 str2) = (x1 == x2) && (str1 == str2)
+  #+END_SRC
+  which we get
+  #+BEGIN_SRC bash
+*Main> Foo 3 "orange" == Foo 6 "apple"
+False
+*Main> Foo 3 "orange" /= Foo 6 "apple"
+True
+  #+END_SRC
+  A few important remarks
+  1. The class Eq is defined in the Standard Preluse. This code sample defines the type Fp and then declares
+     it to be an instance of Eq. The three definitions (class, data type, and instance ) are completely
+     separate and there is no rule about how they are grouped. This means you could easily create a new class
+     Bar and then declare the type Integer to be an instance of it.
+  2. Classes are not types 
+
+  
+* Introducing Functor
+  As discussed before, we can conceivably define a map-style function for any
+  arbitrary data structure.
+
+  When map was first introducted, there was a process of taking a very specific
+  function for list elements and generalizing to show how map combines any 
+  appropriate function with all sorts of lists. 
+
+  Now... we will generalize this /further/. Instead of map-for-lists and
+  map-for-trees and other distinct maps, how about a general concept of maps
+  for ALL sorts of mappable types?
+
+  Introducing the Functor class!
+
+  - Functor :: is a Prelude class for types which can be mapped over. It has
+               a single method called fmap. The class is defined as follows:
+
+               #+BEGIN_SRC haskell
+                 class Functor f where
+                   fmap :: (a -> b) -> f a -> f b
+               #+END_SRC
+
+               The type variable 'f' is a parameterized data type; in the
+               signature of 'fmap', 'f' takes 'a' as a type parameter in 
+               one of its appearances, and 'b' in the other.
+
+  *Example 1*
+  By replacing 'f' with 'Maybe' we get the following signature for 'fmap',
+  which fits the natural definition
+  #+BEGIN_SRC haskell
+    fmap :: (a -> b) -> Maybe a -> Maybe b
+    instance Functor Maybe where
+      fmap f Nothing = Nothing
+      fmap f (Just x ) - Just (f x)
+  #+END_SRC
+
+  *Example 2*
+  The 'Functor' instance for lists
+  #+BEGIN_SRC haskell
+    instance Function [] where
+      fmap = map
+  #+END_SRC
+
+  *Example 3*
+  The 'Funcfor' instance for Tree
+  #+BEGIN_SRC haskell
+    instance Functor Tree where
+      fmap f (Leaf x) = Leaf (f x)
+      fmap f (Branch left right) = Branch (fmap f left) (fmap f right)
+  #+END_SRC
+
+** The functor laws
+   When providing a new instance of 'Functor', you should ensure it satifies the
+   two functor laws. There is nothing mysterious about these laws; their role
+   is to guarantee 'fmap' behaves sanely and actually performs a mapping operation
+   (as opposed to some other nonsense).
+
+   *The first law is*
+   #+BEGIN_SRC haskell
+     fmap id = id
+   #+END_SRC
+   which states that mapping 'id' over a functorial value must return the functorial
+   value unchanged.
+
+   *The second law is*
+   #+BEGIN_SRC haskell
+     fmap (g . f) = fmap g . fmap f
+   #+END_SRC
+   It states that it should not matter whether we map a composed function or first
+   map one function and then the other ( assuming the application order remains
+   the same in both cases )
+
+** What did we gain, why the Functor class?
+   At this point, we can ask what benefit we get from the extra layer of 
+   generalization brought by the 'Functor' class. There are two significant
+   advantages:
+
+   - The availability of the fmap method relieves us from having to recall, read
+     , and write a plethora of differently named mapping methods (e.g maybeMap,
+     treeMap, weirdMap, ad infinitum). As a consequence, code becomes cleaner
+     and easier to understand. On spotting a use of fmap, we instantly have
+     a general idea of what is going on. Given the gurantees of the functor laws,
+     this general idea is surprisingly precise.
+
+   - Using the type class system, we can write fmap based algorithms which work
+     out of the box with any /functor/, - be it [], Maybe, Tree or whatever you
+     need. Indeed a number of useful classes in the core libraries inherit from
+     Functor
+
+   Type classes makes it possible to create general solutions to whole categories
+   of problems. Depending on what you use Haskell for, you may not need to define
+   new classes often, but ou will certainly be using type classes all the time.
+   Many of the most powerful features and sophisticated capabilities of Haskell
+   rely on type classess. From this point on, classes will be a prominent presence
+   in our studies.
+
+   *side*
+   Based on the reading of functor, the type definition of fmap
+
+   fmap :: Functor f => (a -> b) -> f a -> f b
+
+   is interpretted as follows:
+
+   fmap takes a function that takes some value 'a' and return 'b' and a 
+   paramterized type f (which is an instance of Functor ) instantiated
+   with value a and returns another parameterized type f instantiated
+   with value b.
+
+   Whenever types instantiated from the Functor class define the fmap
+   method, we have a way of applying a function to those types without
+   having to know (i.e define) a way to apply the function to those types.
+
+   
+
